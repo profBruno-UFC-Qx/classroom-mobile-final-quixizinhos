@@ -3,28 +3,29 @@
 # Proposta de aplicativo
 
 ## Equipe
-* **Nome do Aluno(a) 1:** [Seu nome e matrícula]
-* **Nome do Aluno(a) 2:** [Seu nome e matrícula]
-* **Nome do Aluno(a) 3:** [Seu nome e matrícula]
+* **Nome do Aluno(a) 1:** Sammy Diogenes Ferreira - 553747
+* **Nome do Aluno(a) 2:** Andre Lucas de Melo Bezerra - 554216
 * ...
 
 ---
 
 ## Título do Projeto
-[Escolha um título criativo e descritivo para o seu projeto.]
+DexGo.
 
 ## Descrição do Projeto
-[Descreva em 2-3 parágrafos o que o seu projeto faz. Qual é o problema que ele resolve? Quem é o público-alvo? Quais são as principais funcionalidades?]
+O Pokédex é um aplicativo mobile que permite aos usuários colecionar, gerenciar e compartilhar cartinhas de Pokémon. Além de manter uma coleção personalizada, o usuário pode ganhar novas cartas diariamente, interagir com amigos e trocar ou compartilhar cartas por meio de um sistema de QR Codes exclusivo. O objetivo do sistema é proporcionar uma experiência divertida e social, combinando elementos de colecionismo com interação entre jogadores.
 
 ---
 
 ## Funcionalidades Principais
 [Liste as principais funcionalidades do projeto. Use caixas de seleção para que a equipe possa marcar as concluídas nas próximas etapas.]
 
-- [ ] Funcionalidade 1: [Breve descrição da funcionalidade]
-- [ ] Funcionalidade 2: [Breve descrição da funcionalidade]
-- [ ] Funcionalidade 3: [Breve descrição da funcionalidade]
-- [ ] ...
+- [ ] Cadastro de Conta: Permite que novos usuários criem uma conta no aplicativo. Inclui informações básicas como nome, e-mail, senha e avatar. Após o cadastro, o usuário tem acesso à sua coleção e às demais funcionalidades do sistema.
+- [ ] Login e Autenticação: O usuário pode acessar sua conta inserindo e-mail e senha. Validação de credenciais e tratamento de erros (senha incorreta, conta inexistente, etc.).
+- [ ] Gerenciamento de Perfil: Edição de informações do perfil (nome, avatar, biografia, etc.). Exclusão da conta, removendo permanentemente todos os dados do usuário e suas cartas.
+- [ ] Painel de Cartinhas: Exibe todas as cartas do usuário, com filtros e categorias: Por região (Kanto, Johto, Hoenn, etc.), Por favoritas, Por nível de poder (mais fortes, raras, etc.). Permite visualizar detalhes de cada carta, como tipo, poder e descrição.
+- [ ] Sistema de Recompensas Diárias: Todos os dias o usuário pode ganhar uma nova carta por meio de um sorteio aleatório. Caso o usuário já possua a carta sorteada, uma nova carta diferente será concedida automaticamente.
+- [ ] Compartilhamento de Cartas: O usuário pode compartilhar uma carta específica com até uma pessoa. Cada carta compartilhada gera um QR Code. O QR Code pode ser escaneado, permitindo que o amigo receba a carta compartilhada. Caso o destinatário já possua a carta, ele receberá uma notificação e não haverá duplicação.
 
 ---
 
