@@ -13,7 +13,8 @@
 DexGo.
 
 ## Descrição do Projeto
-O Pokédex é um aplicativo mobile que permite aos usuários colecionar, gerenciar e compartilhar cartinhas de Pokémon. Além de manter uma coleção personalizada, o usuário pode ganhar novas cartas diariamente, interagir com amigos e trocar ou compartilhar cartas por meio de um sistema de QR Codes exclusivo. O objetivo do sistema é proporcionar uma experiência divertida e social, combinando elementos de colecionismo com interação entre jogadores.
+O Pokédex é um aplicativo mobile que permite aos usuários colecionar, gerenciar e compartilhar cartinhas de Pokémon. Além de manter uma coleção personalizada, o usuário pode ganhar novas cartas diariamente, interagir com amigos e trocar ou compartilhar cartas por meio de um sistema de QR Codes exclusivo. O objetivo do sistema é proporcionar uma experiência divertida e social, combinando elementos de colecionismo com interação entre jogadores. O armazenamento local será utilizado para manter informações do usuário (como sessão ativa, cartas coletadas e preferências) de forma offline, garantindo que o aplicativo continue funcional mesmo sem conexão com a internet.
+Além disso, será integrada uma API externa da PokéAPI (https://pokeapi.co/) para obter dados oficiais dos Pokémon, como nome, tipo, imagem e descrição, que servirão de base para as cartas do jogo.
 
 ---
 
