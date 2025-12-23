@@ -2,45 +2,32 @@ package com.example.projetopokedex.ui.login
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import com.example.projetopokedex.ui.components.HoverButton
 import com.example.projetopokedex.R
+import com.example.projetopokedex.ui.components.HoverButton
 
 @Composable
 fun LoginScreen(
+    uiState: LoginUiState,
+    onEmailChange: (String) -> Unit,
+    onPasswordChange: (String) -> Unit,
+    onLoginClick: () -> Unit,
     onNavigateToSignUp: () -> Unit
 ) {
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -57,8 +44,7 @@ fun LoginScreen(
             Image(
                 painter = painterResource(id = R.drawable.logo),
                 contentDescription = "Pokédex",
-                modifier = Modifier
-                    .size(150.dp)
+                modifier = Modifier.size(150.dp)
             )
 
             Text(
@@ -90,10 +76,9 @@ fun LoginScreen(
                     .padding(bottom = 4.dp)
             )
             OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
-                modifier = Modifier
-                    .fillMaxWidth(),
+                value = uiState.email,
+                onValueChange = onEmailChange,
+                modifier = Modifier.fillMaxWidth(),
                 placeholder = { Text("test12@gmail.com") },
                 singleLine = true,
                 shape = RoundedCornerShape(12.dp)
@@ -109,8 +94,8 @@ fun LoginScreen(
                     .padding(bottom = 4.dp)
             )
             OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
+                value = uiState.password,
+                onValueChange = onPasswordChange,
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = { Text("************") },
                 singleLine = true,
@@ -129,12 +114,30 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(32.dp))
 
             HoverButton(
-                text = "Entrar",
-                onClick = {  },
+                text = if (uiState.isLoading) "Entrando..." else "Entrar",
+                onClick = onLoginClick,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(52.dp)
             )
+
+            if (uiState.error != null) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = uiState.error,
+                    color = Color.Red,
+                    fontSize = 12.sp
+                )
+            }
+
+            if (uiState.successMessage != null) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = uiState.successMessage,
+                    color = Color(0xFF4CAF50),
+                    fontSize = 12.sp
+                )
+            }
 
             Spacer(modifier = Modifier.height(24.dp))
 
@@ -157,4 +160,3 @@ fun LoginScreen(
         )
     }
 }
-
