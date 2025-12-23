@@ -5,8 +5,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -18,13 +20,14 @@ import com.example.projetopokedex.ui.components.HoverButton
 
 @Composable
 fun SignUpScreen(
+    uiState: SignUpUiState,
+    onAvatarChange: (String) -> Unit,
+    onNameChange: (String) -> Unit,
+    onEmailChange: (String) -> Unit,
+    onPasswordChange: (String) -> Unit,
+    onSignUpClick: () -> Unit,
     onBackToLogin: () -> Unit
 ) {
-    var avatar by remember { mutableStateOf("") }
-    var name by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -35,8 +38,7 @@ fun SignUpScreen(
         Spacer(modifier = Modifier.height(40.dp))
 
         Row(
-            modifier = Modifier
-                .fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
@@ -59,8 +61,8 @@ fun SignUpScreen(
 
         Text(text = "Avatar", fontSize = 14.sp, modifier = Modifier.fillMaxWidth())
         OutlinedTextField(
-            value = avatar,
-            onValueChange = { avatar = it },
+            value = uiState.avatar,
+            onValueChange = onAvatarChange,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 4.dp),
@@ -79,8 +81,8 @@ fun SignUpScreen(
 
         Text(text = "Nome", fontSize = 14.sp, modifier = Modifier.fillMaxWidth())
         OutlinedTextField(
-            value = name,
-            onValueChange = { name = it },
+            value = uiState.name,
+            onValueChange = onNameChange,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 4.dp, bottom = 16.dp),
@@ -91,8 +93,8 @@ fun SignUpScreen(
 
         Text(text = "E-mail", fontSize = 14.sp, modifier = Modifier.fillMaxWidth())
         OutlinedTextField(
-            value = email,
-            onValueChange = { email = it },
+            value = uiState.email,
+            onValueChange = onEmailChange,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 4.dp, bottom = 16.dp),
@@ -103,8 +105,8 @@ fun SignUpScreen(
 
         Text(text = "Senha", fontSize = 14.sp, modifier = Modifier.fillMaxWidth())
         OutlinedTextField(
-            value = password,
-            onValueChange = { password = it },
+            value = uiState.password,
+            onValueChange = onPasswordChange,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 4.dp, bottom = 32.dp),
@@ -115,11 +117,29 @@ fun SignUpScreen(
         )
 
         HoverButton(
-            text = "Confirmar",
-            onClick = {  },
+            text = if (uiState.isLoading) "Confirmando..." else "Confirmar",
+            onClick = onSignUpClick,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp)
         )
+
+        if (uiState.error != null) {
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = uiState.error,
+                color = Color.Red,
+                fontSize = 12.sp
+            )
+        }
+
+        if (uiState.isRegistered && uiState.error == null) {
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "Usuário cadastrado com sucesso!",
+                color = Color(0xFF4CAF50),
+                fontSize = 12.sp
+            )
+        }
     }
 }
