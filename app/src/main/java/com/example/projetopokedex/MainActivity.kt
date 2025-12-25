@@ -8,7 +8,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -26,6 +28,7 @@ import com.example.projetopokedex.ui.signup.SignUpViewModel
 import com.example.projetopokedex.ui.theme.ProjetoPokedexTheme
 import kotlinx.coroutines.delay
 import com.example.projetopokedex.ui.home.HomeScreen
+import com.example.projetopokedex.ui.navigation.HomeTab
 import com.example.projetopokedex.ui.home.HomeViewModel
 
 
@@ -160,10 +163,11 @@ fun ProjetoPokedexApp() {
             }
 
             composable(PokedexScreen.Home.name) {
-                val state by homeViewModel.uiState.collectAsState()
+                val homeState by homeViewModel.uiState.collectAsState()
+                var selectedTab by remember { mutableStateOf(HomeTab.Home) }
 
                 HomeScreen(
-                    uiState = state,
+                    uiState = homeState,
                     onLogoutClick = {
                         homeViewModel.logout()
                         loginViewModel.clearMessages()
@@ -171,6 +175,14 @@ fun ProjetoPokedexApp() {
                         navController.navigate(PokedexScreen.Login.name) {
                             popUpTo(PokedexScreen.Home.name) { inclusive = true }
                         }
+                    },
+                    selectedTab = selectedTab,
+                    onTabSelected = { tab ->
+                        selectedTab = tab
+                        // navegar para outras telas
+                    },
+                    onSortearClick = {
+                        // lógica de sorteio será implementada depois
                     }
                 )
             }
