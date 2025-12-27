@@ -24,12 +24,16 @@ import com.example.projetopokedex.ui.home.PokemonCardUi
 @Composable
 fun PokemonCard(
     data: PokemonCardUi,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    compact: Boolean = false
 ) {
+    val nameFontSize = if (compact) 10.sp else 16.sp
+    val typeFontSize = if (compact) 8.sp else 12.sp
+
     Box(
         modifier = modifier
-            .width(200.dp)
-            .height(280.dp)
+            .width(if (compact) 120.dp else 200.dp)
+            .height(if (compact) 160.dp else 280.dp)
     ) {
         Image(
             painter = painterResource(id = R.drawable.fundo),
@@ -52,13 +56,13 @@ fun PokemonCard(
             ) {
                 Text(
                     text = data.name,
-                    fontSize = 16.sp,
+                    fontSize = nameFontSize,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.weight(1f)
                 )
                 Text(
                     text = data.type,
-                    fontSize = 12.sp,
+                    fontSize = typeFontSize,
                     textAlign = TextAlign.End,
                     modifier = Modifier.align(Alignment.CenterVertically)
                 )

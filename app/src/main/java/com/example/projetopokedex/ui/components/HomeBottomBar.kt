@@ -20,35 +20,41 @@ fun HomeBottomBar(
     selectedTab: HomeTab,
     onTabSelected: (HomeTab) -> Unit
 ) {
-    Surface(
-        color = Color.White,
-        tonalElevation = 4.dp,
-        shadowElevation = 8.dp,
-        shape = RoundedCornerShape(24.dp)
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp, vertical = 20.dp)
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(72.dp)
-                .padding(horizontal = 32.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+        Surface(
+            color = Color.White,
+            tonalElevation = 4.dp,
+            shadowElevation = 8.dp,
+            shape = RoundedCornerShape(24.dp)
         ) {
-            BottomBarItem(
-                isSelected = selectedTab == HomeTab.Cards,
-                iconRes = R.drawable.icon_cards_pokemon,
-                onClick = { onTabSelected(HomeTab.Cards) }
-            )
-            BottomBarItem(
-                isSelected = selectedTab == HomeTab.Home,
-                iconRes = R.drawable.home,
-                onClick = { onTabSelected(HomeTab.Home) }
-            )
-            BottomBarItem(
-                isSelected = selectedTab == HomeTab.Qr,
-                iconRes = R.drawable.qr_code,
-                onClick = { onTabSelected(HomeTab.Qr) }
-            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(72.dp)
+                    .padding(horizontal = 32.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                BottomBarItem(
+                    isSelected = selectedTab == HomeTab.Cards,
+                    iconRes = R.drawable.icon_cards_pokemon,
+                    onClick = { onTabSelected(HomeTab.Cards) }
+                )
+                BottomBarItem(
+                    isSelected = selectedTab == HomeTab.Home,
+                    iconRes = R.drawable.home,
+                    onClick = { onTabSelected(HomeTab.Home) }
+                )
+                BottomBarItem(
+                    isSelected = selectedTab == HomeTab.Qr,
+                    iconRes = R.drawable.qr_code,
+                    onClick = { onTabSelected(HomeTab.Qr) }
+                )
+            }
         }
     }
 }
