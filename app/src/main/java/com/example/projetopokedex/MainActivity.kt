@@ -1,5 +1,6 @@
 package com.example.projetopokedex
 
+import com.example.projetopokedex.ui.components.MainScaffold
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -20,6 +21,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.projetopokedex.data.repository.UserRepository
 import com.example.projetopokedex.data.local.UserLocalDataSource
+import com.example.projetopokedex.ui.cards.CardDetailDialog
 import com.example.projetopokedex.ui.login.LoginScreen
 import com.example.projetopokedex.ui.login.LoginViewModel
 import com.example.projetopokedex.ui.navigation.PokedexScreen
@@ -30,7 +32,8 @@ import kotlinx.coroutines.delay
 import com.example.projetopokedex.ui.home.HomeScreen
 import com.example.projetopokedex.ui.navigation.HomeTab
 import com.example.projetopokedex.ui.home.HomeViewModel
-
+import com.example.projetopokedex.ui.cards.CardsScreen
+import com.example.projetopokedex.ui.cards.CardsViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -78,6 +81,15 @@ class HomeViewModelFactory(
     }
 }
 
+class CardsViewModelFactory : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(CardsViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return CardsViewModel() as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+    }
+}
 
 @Composable
 fun ProjetoPokedexApp() {
@@ -107,6 +119,7 @@ fun ProjetoPokedexApp() {
             navController = navController,
             startDestination = startDestination
         ) {
+
             composable(PokedexScreen.Login.name) {
                 val state by loginViewModel.uiState.collectAsState()
 
@@ -166,25 +179,72 @@ fun ProjetoPokedexApp() {
                 val homeState by homeViewModel.uiState.collectAsState()
                 var selectedTab by remember { mutableStateOf(HomeTab.Home) }
 
-                HomeScreen(
-                    uiState = homeState,
-                    onLogoutClick = {
-                        homeViewModel.logout()
-                        loginViewModel.clearMessages()
-                        loginViewModel.clearCredentials()
-                        navController.navigate(PokedexScreen.Login.name) {
-                            popUpTo(PokedexScreen.Home.name) { inclusive = true }
-                        }
-                    },
+                MainScaffold(
                     selectedTab = selectedTab,
                     onTabSelected = { tab ->
                         selectedTab = tab
-                        // navegar para outras telas
+                        when (tab) {
+                            HomeTab.Home -> { /* já está na Home */ }
+                            HomeTab.Cards -> {
+                                navController.navigate(PokedexScreen.Cards.name)
+                            }
+                            HomeTab.Qr -> {
+                                // tela de scanner
+                            }
+                        }
                     },
-                    onSortearClick = {
-                        // lógica de sorteio será implementada depois
+                    overlayContent = null
+                ) {
+                    HomeScreen(
+                        uiState = homeState,
+                        onLogoutClick = {
+                            homeViewModel.logout()
+                            loginViewModel.clearMessages()
+                            loginViewModel.clearCredentials()
+                            navController.navigate(PokedexScreen.Login.name) {
+                                popUpTo(PokedexScreen.Home.name) { inclusive = true }
+                            }
+                        },
+                        onSortearClick = { /* depois */ }
+                    )
+                }
+            }
+
+            composable(PokedexScreen.Cards.name) {
+                val cardsViewModel: CardsViewModel = viewModel(factory = CardsViewModelFactory())
+                var selectedTab by remember { mutableStateOf(HomeTab.Cards) }
+                val state by cardsViewModel.uiState.collectAsState()
+
+                MainScaffold(
+                    selectedTab = selectedTab,
+                    onTabSelected = { tab ->
+                        selectedTab = tab
+                        when (tab) {
+                            HomeTab.Home -> {
+                                navController.navigate(PokedexScreen.Home.name) {
+                                    popUpTo(PokedexScreen.Home.name) { inclusive = false }
+                                }
+                            }
+                            HomeTab.Cards -> { /* já está na Home */ }
+                            HomeTab.Qr -> { /* tela de scanner */ }
+                        }
+                    },
+                    overlayContent = state.selectedCard?.let { selected ->
+                        {
+                            CardDetailDialog(
+                                card = selected,
+                                isShowingBack = state.isShowingBack,
+                                onToggleFace = { cardsViewModel.onToggleFace() },
+                                onDismiss = { cardsViewModel.onDismissDialog() }
+                            )
+                        }
+                    },
+                    onOverlayDismiss = {
+                        cardsViewModel.onDismissDialog()
                     }
-                )
+                ) {
+                    CardsScreen(viewModel = cardsViewModel)
+                }
             }
         }
     }

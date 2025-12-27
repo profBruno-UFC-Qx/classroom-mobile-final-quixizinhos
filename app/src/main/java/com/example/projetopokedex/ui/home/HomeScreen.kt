@@ -21,15 +21,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.projetopokedex.R
-import com.example.projetopokedex.ui.navigation.HomeTab
-import com.example.projetopokedex.ui.components.HomeBottomBar
 
 @Composable
 fun HomeScreen(
     uiState: HomeUiState,
     onLogoutClick: () -> Unit,
-    selectedTab: HomeTab,
-    onTabSelected: (HomeTab) -> Unit,
     onSortearClick: () -> Unit
 ) {
     Column(
@@ -136,12 +132,5 @@ fun HomeScreen(
                 )
             }
         }
-
-        Spacer(modifier = Modifier.height(175.dp))
-
-        HomeBottomBar(
-            selectedTab = selectedTab,
-            onTabSelected = onTabSelected
-        )
     }
 }

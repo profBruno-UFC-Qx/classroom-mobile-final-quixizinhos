@@ -9,10 +9,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 
-data class HomeUiState(
-    val userName: String = ""
-)
-
 class HomeViewModel(
     private val userRepository: UserRepository
 ) : ViewModel() {
