@@ -6,7 +6,6 @@ import com.example.projetopokedex.data.repository.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
@@ -17,9 +16,16 @@ class HomeViewModel(
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
     init {
+        observeUserName()
+    }
+
+    private fun observeUserName() {
         viewModelScope.launch {
-            val name = userRepository.userName.firstOrNull() ?: ""
-            _uiState.value = HomeUiState(userName = name)
+            userRepository.userName.collect { name ->
+                _uiState.value = _uiState.value.copy(
+                    userName = name.orEmpty()
+                )
+            }
         }
     }
 
