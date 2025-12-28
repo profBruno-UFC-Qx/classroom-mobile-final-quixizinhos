@@ -24,7 +24,7 @@ Além disso, será integrada uma API externa da PokéAPI (https://pokeapi.co/) p
 - [ ] Cadastro de Conta: Permite que novos usuários criem uma conta no aplicativo. Inclui informações básicas como nome, e-mail, senha e avatar. Após o cadastro, o usuário tem acesso à sua coleção e às demais funcionalidades do sistema.
 - [ ] Login e Autenticação: O usuário pode acessar sua conta inserindo e-mail e senha. Validação de credenciais e tratamento de erros (senha incorreta, conta inexistente, etc.).
 - [ ] Gerenciamento de Perfil: Edição de informações do perfil (nome, avatar, biografia, etc.). Exclusão da conta, removendo permanentemente todos os dados do usuário e suas cartas.
-- [ ] Painel de Cartinhas: Exibe todas as cartas do usuário, com filtros e categorias: Por região (Kanto, Johto, Hoenn, etc.), Por favoritas, Por nível de poder (mais fortes, raras, etc.). Permite visualizar detalhes de cada carta, como tipo, poder e descrição.
+- [ ] Painel de Cartinhas: Exibe todas as cartas do usuário, com filtros e a visualização de detalhes de cada carta, como tipo, hp e ataques.
 - [ ] Sistema de Recompensas Diárias: Todos os dias o usuário pode ganhar uma nova carta por meio de um sorteio aleatório. Caso o usuário já possua a carta sorteada, uma nova carta diferente será concedida automaticamente.
 - [ ] Compartilhamento de Cartas: O usuário pode compartilhar uma carta específica com até uma pessoa. Cada carta compartilhada gera um QR Code. O QR Code pode ser escaneado, permitindo que o amigo receba a carta compartilhada. Caso o destinatário já possua a carta, ele receberá uma notificação e não haverá duplicação.
 
