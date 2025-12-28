@@ -34,6 +34,9 @@ import com.example.projetopokedex.ui.navigation.HomeTab
 import com.example.projetopokedex.ui.home.HomeViewModel
 import com.example.projetopokedex.ui.cards.CardsScreen
 import com.example.projetopokedex.ui.cards.CardsViewModel
+import com.example.projetopokedex.ui.profile.ProfileScreen
+import com.example.projetopokedex.ui.profile.ProfileViewModel
+import com.example.projetopokedex.ui.profile.DeleteAccountDialog
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -91,6 +94,19 @@ class CardsViewModelFactory : ViewModelProvider.Factory {
     }
 }
 
+class ProfileViewModelFactory(
+    private val userRepository: UserRepository
+) : ViewModelProvider.Factory {
+
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(ProfileViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return ProfileViewModel(userRepository) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+    }
+}
+
 @Composable
 fun ProjetoPokedexApp() {
     ProjetoPokedexTheme {
@@ -111,6 +127,10 @@ fun ProjetoPokedexApp() {
 
         val homeViewModel: HomeViewModel = viewModel(
             factory = HomeViewModelFactory(userRepository)
+        )
+
+        val profileViewModel: ProfileViewModel = viewModel(
+            factory = ProfileViewModelFactory(userRepository)
         )
 
         val startDestination = PokedexScreen.Login.name
@@ -191,6 +211,9 @@ fun ProjetoPokedexApp() {
                             HomeTab.Qr -> {
                                 // tela de scanner
                             }
+                            HomeTab.Profile -> {
+                                navController.navigate(PokedexScreen.Profile.name)
+                            }
                         }
                     },
                     overlayContent = null
@@ -227,6 +250,9 @@ fun ProjetoPokedexApp() {
                             }
                             HomeTab.Cards -> { /* já está na Home */ }
                             HomeTab.Qr -> { /* tela de scanner */ }
+                            HomeTab.Profile -> {
+                                navController.navigate(PokedexScreen.Profile.name)
+                            }
                         }
                     },
                     overlayContent = state.selectedCard?.let { selected ->
@@ -244,6 +270,65 @@ fun ProjetoPokedexApp() {
                     }
                 ) {
                     CardsScreen(viewModel = cardsViewModel)
+                }
+            }
+
+            composable(PokedexScreen.Profile.name) {
+                val profileState by profileViewModel.uiState.collectAsState()
+                var selectedTab by remember { mutableStateOf(HomeTab.Profile) }
+
+                LaunchedEffect(Unit) {
+                    profileViewModel.onDismissDeleteDialog()
+                }
+
+                MainScaffold(
+                    selectedTab = selectedTab,
+                    onTabSelected = { tab ->
+                        selectedTab = tab
+                        when (tab) {
+                            HomeTab.Home -> navController.navigate(PokedexScreen.Home.name)
+                            HomeTab.Cards -> navController.navigate(PokedexScreen.Cards.name)
+                            HomeTab.Qr -> { /* scanner */ }
+                            HomeTab.Profile -> { /* já está na Profile */ }
+                        }
+                    },
+                    overlayContent = if (profileState.showDeleteDialog) {
+                        {
+                            DeleteAccountDialog(
+                                onConfirm = {
+                                    profileViewModel.confirmDeleteAccount {
+                                        navController.navigate(PokedexScreen.Login.name) {
+                                            popUpTo(PokedexScreen.Home.name) { inclusive = true }
+                                        }
+                                    }
+                                },
+                                onDismiss = { profileViewModel.onDismissDeleteDialog() }
+                            )
+                        }
+                    } else null,
+                    onOverlayDismiss = {
+                        profileViewModel.onDismissDeleteDialog()
+                    }
+                ) {
+                    ProfileScreen(
+                        uiState = profileState,
+                        onAvatarChange = profileViewModel::onAvatarChange,
+                        onNameChange = profileViewModel::onNameChange,
+                        onPasswordChange = profileViewModel::onPasswordChange,
+                        onToggleEdit = profileViewModel::onToggleEdit,
+                        onSaveChanges = profileViewModel::onSaveChanges,
+                        onCancelEdit = profileViewModel::cancelEdit,
+                        onToggleThemeIcon = profileViewModel::onToggleThemeIcon,
+                        onDeleteClick = profileViewModel::onDeleteClick,
+                        onDismissDeleteDialog = profileViewModel::onDismissDeleteDialog,
+                        onConfirmDelete = {
+                            profileViewModel.confirmDeleteAccount {
+                                navController.navigate(PokedexScreen.Login.name) {
+                                    popUpTo(PokedexScreen.Home.name) { inclusive = true }
+                                }
+                            }
+                        }
+                    )
                 }
             }
         }

@@ -54,6 +54,11 @@ fun HomeBottomBar(
                     iconRes = R.drawable.qr_code,
                     onClick = { onTabSelected(HomeTab.Qr) }
                 )
+                BottomBarItem(
+                    isSelected = selectedTab == HomeTab.Profile,
+                    iconRes = R.drawable.user_male,
+                    onClick = { onTabSelected(HomeTab.Profile) }
+                )
             }
         }
     }

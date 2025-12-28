@@ -26,7 +26,6 @@ object UserPrefsKeys {
 class UserLocalDataSource(private val context: Context) {
 
     // USER
-
     suspend fun saveUser(user: UserLocal) {
         context.userDataStore.edit { prefs ->
             prefs[UserPrefsKeys.AVATAR] = user.avatar
@@ -57,8 +56,38 @@ class UserLocalDataSource(private val context: Context) {
         return prefs[UserPrefsKeys.NAME]
     }
 
-    // TOKEN
+    suspend fun updateUser(updated: UserLocal) {
+        context.userDataStore.edit { prefs ->
+            prefs[UserPrefsKeys.AVATAR] = updated.avatar
+            prefs[UserPrefsKeys.NAME] = updated.name
+            prefs[UserPrefsKeys.EMAIL] = updated.email
+            prefs[UserPrefsKeys.PASSWORD] = updated.password
+        }
+    }
 
+    suspend fun deleteUser() {
+        context.userDataStore.edit { prefs ->
+            prefs[UserPrefsKeys.AVATAR] = ""
+            prefs[UserPrefsKeys.NAME] = ""
+            prefs[UserPrefsKeys.EMAIL] = ""
+            prefs[UserPrefsKeys.PASSWORD] = ""
+            prefs[UserPrefsKeys.TOKEN] = ""
+        }
+    }
+
+    suspend fun getCurrentUser(): UserLocal? {
+        val prefs = context.userDataStore.data.firstOrNull() ?: return null
+        val email = prefs[UserPrefsKeys.EMAIL] ?: return null
+        val avatar = prefs[UserPrefsKeys.AVATAR] ?: ""
+        val name = prefs[UserPrefsKeys.NAME] ?: ""
+        val password = prefs[UserPrefsKeys.PASSWORD] ?: ""
+        return UserLocal(avatar = avatar, name = name, email = email, password = password)
+    }
+
+    val userNameFlow: Flow<String?> =
+        context.userDataStore.data.map { prefs -> prefs[UserPrefsKeys.NAME] }
+
+    // TOKEN
     val tokenFlow: Flow<String?> =
         context.userDataStore.data.map { prefs -> prefs[UserPrefsKeys.TOKEN] }
 
