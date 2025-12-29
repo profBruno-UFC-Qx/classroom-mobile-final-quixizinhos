@@ -1,5 +1,6 @@
 package com.example.projetopokedex.ui.components
 
+import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -10,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -20,27 +22,13 @@ import com.example.projetopokedex.R
 @Composable
 fun PokemonCardBack(
     modifier: Modifier = Modifier,
-    qrContent: @Composable () -> Unit = {
-        // placeholder para o QRCode
-        Box(
-            modifier = Modifier
-                .size(120.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = "QR Code",
-                fontSize = 12.sp,
-                textAlign = TextAlign.Center
-            )
-        }
-    }
+    qrBitmap: Bitmap? = null
 ) {
     Box(
         modifier = modifier
             .width(200.dp)
             .height(280.dp)
     ) {
-        // Fundo da cartinha
         Image(
             painter = painterResource(id = R.drawable.fundo),
             contentDescription = null,
@@ -55,7 +43,6 @@ fun PokemonCardBack(
                 .fillMaxSize()
                 .padding(12.dp)
         ) {
-            // Pokébola topo esquerdo
             Image(
                 painter = painterResource(id = R.drawable.pokebola),
                 contentDescription = null,
@@ -65,7 +52,6 @@ fun PokemonCardBack(
                     .offset(x = (-8).dp, y = (-8).dp)
             )
 
-            // Pokébola inferior direito
             Image(
                 painter = painterResource(id = R.drawable.pokebola),
                 contentDescription = null,
@@ -75,10 +61,8 @@ fun PokemonCardBack(
                     .offset(x = (8).dp, y = (8).dp)
             )
 
-            // Área central para o QRCode
             Card(
-                modifier = Modifier
-                    .align(Alignment.Center),
+                modifier = Modifier.align(Alignment.Center),
                 shape = RoundedCornerShape(4.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = androidx.compose.ui.graphics.Color.Gray
@@ -86,11 +70,22 @@ fun PokemonCardBack(
                 elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
             ) {
                 Box(
-                    modifier = Modifier
-                        .padding(2.dp),
+                    modifier = Modifier.padding(2.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    qrContent()
+                    if (qrBitmap != null) {
+                        Image(
+                            bitmap = qrBitmap.asImageBitmap(),
+                            contentDescription = "QR da carta",
+                            modifier = Modifier.size(120.dp)
+                        )
+                    } else {
+                        Text(
+                            text = "QR Code",
+                            fontSize = 12.sp,
+                            textAlign = TextAlign.Center
+                        )
+                    }
                 }
             }
         }

@@ -1,5 +1,6 @@
 package com.example.projetopokedex.ui.cards
 
+import android.graphics.Bitmap
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Card
@@ -16,11 +17,12 @@ fun CardDetailDialog(
     card: CollectionCardUi,
     isShowingBack: Boolean,
     onToggleFace: () -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    qrBitmap: Bitmap? = null
 ) {
     Box(
         modifier = Modifier
-            .clickable(onClick = onDismiss),
+            .clickable(onClick = onDismiss)
     ) {
         Card(
             modifier = Modifier
@@ -34,7 +36,10 @@ fun CardDetailDialog(
             elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
         ) {
             if (isShowingBack) {
-                PokemonCardBack(modifier = Modifier.fillMaxSize())
+                PokemonCardBack(
+                    modifier = Modifier.fillMaxSize(),
+                    qrBitmap = qrBitmap
+                )
             } else {
                 PokemonCard(
                     data = card.card,
