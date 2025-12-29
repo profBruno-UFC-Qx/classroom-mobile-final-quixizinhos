@@ -5,6 +5,12 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -12,15 +18,26 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.projetopokedex.data.local.AppDatabase
 import com.example.projetopokedex.data.repository.UserRepository
 import com.example.projetopokedex.data.local.UserLocalDataSource
+import com.example.projetopokedex.data.network.RetrofitConfig
+import com.example.projetopokedex.data.network.repository.PokemonRepository
+import com.example.projetopokedex.data.qrcode.QrCodeGenerator
+import com.example.projetopokedex.data.repository.CardsRepository
 import com.example.projetopokedex.ui.cards.CardDetailDialog
 import com.example.projetopokedex.ui.login.LoginScreen
 import com.example.projetopokedex.ui.login.LoginViewModel
@@ -73,22 +90,25 @@ class SignUpViewModelFactory(
 }
 
 class HomeViewModelFactory(
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val cardsRepository: CardsRepository
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(HomeViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return HomeViewModel(userRepository) as T
+            return HomeViewModel(userRepository, cardsRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
 
-class CardsViewModelFactory : ViewModelProvider.Factory {
+class CardsViewModelFactory(
+    private val cardsRepository: CardsRepository
+) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(CardsViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return CardsViewModel() as T
+            return CardsViewModel(cardsRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
@@ -116,6 +136,18 @@ fun ProjetoPokedexApp() {
         val userLocalDataSource = remember { UserLocalDataSource(context) }
         val userRepository = remember { UserRepository(userLocalDataSource) }
 
+        // Room + network
+        val db = remember { AppDatabase.getInstance(context) }
+        val pokemonService = remember { RetrofitConfig.api }
+        val pokemonRepository = remember { PokemonRepository(pokemonService) }
+        val cardsRepository = remember {
+            CardsRepository(
+                userCardDao = db.userCardDao(),
+                pokemonRepository = pokemonRepository,
+                userRepository = userRepository
+            )
+        }
+
         // ViewModels
         val loginViewModel: LoginViewModel = viewModel(
             factory = LoginViewModelFactory(userRepository)
@@ -126,7 +158,11 @@ fun ProjetoPokedexApp() {
         )
 
         val homeViewModel: HomeViewModel = viewModel(
-            factory = HomeViewModelFactory(userRepository)
+            factory = HomeViewModelFactory(userRepository, cardsRepository)
+        )
+
+        val cardsViewModel: CardsViewModel = viewModel(
+            factory = CardsViewModelFactory(cardsRepository)
         )
 
         val profileViewModel: ProfileViewModel = viewModel(
@@ -216,7 +252,45 @@ fun ProjetoPokedexApp() {
                             }
                         }
                     },
-                    overlayContent = null
+                    overlayContent = homeState.lastDrawCard?.let { cardUi ->
+                        {
+                            val qrBitmap = remember(homeState.qrContent) {
+                                homeState.qrContent?.let { content ->
+                                    QrCodeGenerator.generate(content)
+                                }
+                            }
+
+                            CardDetailDialog(
+                                card = com.example.projetopokedex.ui.cards.CollectionCardUi(
+                                    id = cardUi.cardNumber,
+                                    card = cardUi
+                                ),
+                                isShowingBack = false,
+                                onToggleFace = {  },
+                                onDismiss = { homeViewModel.clearLastDraw() },
+                                qrBitmap = qrBitmap
+                            )
+                            if (homeState.alreadyHasCard) {
+                                Spacer(modifier = Modifier.height(12.dp))
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(top = 8.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = "Você já realizou o sorteio de hoje. Volte amanhã.",
+                                        fontSize = 12.sp,
+                                        color = Color.Gray,
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
+                            }
+                        }
+                    },
+                    onOverlayDismiss = {
+                        homeViewModel.clearLastDraw()
+                    }
                 ) {
                     HomeScreen(
                         uiState = homeState,
@@ -228,13 +302,12 @@ fun ProjetoPokedexApp() {
                                 popUpTo(PokedexScreen.Home.name) { inclusive = true }
                             }
                         },
-                        onSortearClick = { /* depois */ }
+                        onSortearClick = { homeViewModel.drawCard() }
                     )
                 }
             }
 
             composable(PokedexScreen.Cards.name) {
-                val cardsViewModel: CardsViewModel = viewModel(factory = CardsViewModelFactory())
                 var selectedTab by remember { mutableStateOf(HomeTab.Cards) }
                 val state by cardsViewModel.uiState.collectAsState()
 

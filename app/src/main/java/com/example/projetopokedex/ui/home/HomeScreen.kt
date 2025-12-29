@@ -1,6 +1,7 @@
 package com.example.projetopokedex.ui.home
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -112,7 +113,8 @@ fun HomeScreen(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(48.dp),
+                .height(48.dp)
+                .clickable(enabled = uiState.canDrawToday, onClick = onSortearClick),
             shape = RoundedCornerShape(24.dp),
             colors = CardDefaults.cardColors(
                 containerColor = Color.White
@@ -126,11 +128,28 @@ fun HomeScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "Sortear",
+                    text = if (uiState.canDrawToday) "Sortear" else "Amanhã tem mais!",
                     fontSize = 16.sp,
                     textAlign = TextAlign.Center
                 )
             }
+        }
+        uiState.errorMessage?.let { msg ->
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = msg,
+                fontSize = 12.sp,
+                color = Color.Red
+            )
+        }
+
+        if (!uiState.canDrawToday && uiState.errorMessage == null) {
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "Você já realizou o sorteio de hoje. Volte amanhã.",
+                fontSize = 12.sp,
+                color = Color.Gray
+            )
         }
     }
 }

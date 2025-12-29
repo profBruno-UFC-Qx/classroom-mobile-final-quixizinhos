@@ -1,20 +1,31 @@
 package com.example.projetopokedex.ui.cards
 
 import androidx.lifecycle.ViewModel
-import com.example.projetopokedex.ui.home.PokemonAttackUi
-import com.example.projetopokedex.ui.home.PokemonCardUi
+import androidx.lifecycle.viewModelScope
+import com.example.projetopokedex.data.repository.CardsRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
-class CardsViewModel : ViewModel() {
+class CardsViewModel(
+    private val cardsRepository: CardsRepository
+) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(
-        CardsUiState(
-            cards = fakeCards() // temporário
-        )
-    )
+    private val _uiState = MutableStateFlow(CardsUiState())
     val uiState: StateFlow<CardsUiState> = _uiState.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            cardsRepository.getUserCards().collect { cards ->
+                _uiState.value = _uiState.value.copy(
+                    cards = cards.mapIndexed { index, card ->
+                        CollectionCardUi(id = index, card = card)
+                    }
+                )
+            }
+        }
+    }
 
     fun onCardClick(card: CollectionCardUi) {
         _uiState.value = _uiState.value.copy(
@@ -36,23 +47,11 @@ class CardsViewModel : ViewModel() {
         )
     }
 
-    private fun fakeCards(): List<CollectionCardUi> {
-        val base = PokemonCardUi(
-            name = "Pikachu",
-            type = "Elétrico",
-            hp = 200,
-            imageUrl = "",
-            attacks = listOf(
-                PokemonAttackUi("Choque do trovão", 30),
-                PokemonAttackUi("Esquivar", null)
-            ),
-            cardNumber = 7
-        )
-        return List(8) { index ->
-            CollectionCardUi(
-                id = index,
-                card = base.copy(cardNumber = 7 + index)
-            )
+    fun drawDailyCard() {
+        viewModelScope.launch {
+            val result = cardsRepository.drawDailyCard()
+            result.onFailure {
+            }
         }
     }
 }

@@ -76,4 +76,9 @@ class UserRepository(
     suspend fun logout() {
         localDataSource.clearToken()
     }
+
+    //CARDS
+    suspend fun canDrawToday(): Boolean = localDataSource.canDrawToday()
+
+    suspend fun markDrawToday() = localDataSource.markDrawToday()
 }

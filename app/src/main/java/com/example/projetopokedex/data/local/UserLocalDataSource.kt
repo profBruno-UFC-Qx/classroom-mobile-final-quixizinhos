@@ -8,6 +8,9 @@ import com.example.projetopokedex.data.model.UserLocal
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 private const val USER_PREFS_NAME = "user_prefs"
 
@@ -21,6 +24,9 @@ object UserPrefsKeys {
     val EMAIL = stringPreferencesKey("email")
     val PASSWORD = stringPreferencesKey("password")
     val TOKEN = stringPreferencesKey("token")
+
+    val LAST_DRAW_DATE = stringPreferencesKey("last_draw_date")
+
 }
 
 class UserLocalDataSource(private val context: Context) {
@@ -100,6 +106,24 @@ class UserLocalDataSource(private val context: Context) {
     suspend fun clearToken() {
         context.userDataStore.edit { prefs ->
             prefs[UserPrefsKeys.TOKEN] = ""
+        }
+    }
+
+    //CARDS
+    private fun todayString(): String {
+        val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        return formatter.format(Date())
+    }
+
+    suspend fun canDrawToday(): Boolean {
+        val prefs = context.userDataStore.data.firstOrNull() ?: return true
+        val last = prefs[UserPrefsKeys.LAST_DRAW_DATE]
+        return last != todayString()
+    }
+
+    suspend fun markDrawToday() {
+        context.userDataStore.edit { prefs ->
+            prefs[UserPrefsKeys.LAST_DRAW_DATE] = todayString()
         }
     }
 }

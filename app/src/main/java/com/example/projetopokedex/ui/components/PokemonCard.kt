@@ -18,6 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.example.projetopokedex.R
 import com.example.projetopokedex.ui.home.PokemonCardUi
 
@@ -85,13 +86,24 @@ fun PokemonCard(
                     containerColor = Color.White
                 )
             ) {
-                // TODO: trocar por CoilAsyncImage assim que conectarmos na API
-                // Ex: AsyncImage(model = data.imageUrl, contentDescription = ...)
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(text = "Imagem", fontSize = 12.sp)
+                    if (data.imageUrl != null) {
+                        AsyncImage(
+                            model = data.imageUrl,
+                            contentDescription = data.name,
+                            contentScale = ContentScale.Fit,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    } else {
+                        Text(
+                            text = "Sem imagem",
+                            fontSize = 12.sp,
+                            color = Color.Gray
+                        )
+                    }
                 }
             }
 

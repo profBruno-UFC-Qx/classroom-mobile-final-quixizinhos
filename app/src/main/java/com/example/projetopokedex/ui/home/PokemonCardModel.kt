@@ -9,7 +9,7 @@ data class PokemonCardUi(
     val name: String,
     val type: String,
     val hp: Int,
-    val imageUrl: String,
+    val imageUrl: String?,
     val attacks: List<PokemonAttackUi>,
     val cardNumber: Int
 )
