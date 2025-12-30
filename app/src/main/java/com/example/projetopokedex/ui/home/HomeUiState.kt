@@ -1,12 +1,11 @@
 package com.example.projetopokedex.ui.home
 
-import com.example.projetopokedex.ui.home.PokemonCardUi
-
 data class HomeUiState(
     val userName: String = "",
-    val lastDrawCard: PokemonCardUi? = null, // carta recém-sorteada
+    val lastDrawCard: PokemonCardUi? = null,
     val canDrawToday: Boolean = true,
-    val alreadyHasCard: Boolean = false,     // se o user já tinha a carta
+    val alreadyHasCard: Boolean = false,
     val errorMessage: String? = null,
-    val qrContent: String? = null
+    val qrContent: String? = null,
+    val isDrawing: Boolean = false
 )

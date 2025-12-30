@@ -5,12 +5,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -18,13 +12,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -33,7 +21,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.projetopokedex.data.local.AppDatabase
 import com.example.projetopokedex.data.repository.UserRepository
-import com.example.projetopokedex.data.local.UserLocalDataSource
+import com.example.projetopokedex.data.local.users.UserLocalDataSource
 import com.example.projetopokedex.data.network.RetrofitConfig
 import com.example.projetopokedex.data.network.repository.PokemonRepository
 import com.example.projetopokedex.data.qrcode.QrCodeGenerator
@@ -51,6 +39,7 @@ import com.example.projetopokedex.ui.navigation.HomeTab
 import com.example.projetopokedex.ui.home.HomeViewModel
 import com.example.projetopokedex.ui.cards.CardsScreen
 import com.example.projetopokedex.ui.cards.CardsViewModel
+import com.example.projetopokedex.ui.components.LoadingOverlay
 import com.example.projetopokedex.ui.profile.ProfileScreen
 import com.example.projetopokedex.ui.profile.ProfileViewModel
 import com.example.projetopokedex.ui.profile.DeleteAccountDialog
@@ -103,12 +92,13 @@ class HomeViewModelFactory(
 }
 
 class CardsViewModelFactory(
-    private val cardsRepository: CardsRepository
+    private val cardsRepository: CardsRepository,
+    private val userRepository: UserRepository
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(CardsViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return CardsViewModel(cardsRepository) as T
+            return CardsViewModel(cardsRepository, userRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
@@ -162,7 +152,7 @@ fun ProjetoPokedexApp() {
         )
 
         val cardsViewModel: CardsViewModel = viewModel(
-            factory = CardsViewModelFactory(cardsRepository)
+            factory = CardsViewModelFactory(cardsRepository, userRepository)
         )
 
         val profileViewModel: ProfileViewModel = viewModel(
@@ -217,6 +207,7 @@ fun ProjetoPokedexApp() {
                         delay(1000)
                         navController.popBackStack()
                         signUpViewModel.onRegistrationConsumed()
+                        signUpViewModel.clearFields()
                     }
                 }
 
@@ -252,44 +243,38 @@ fun ProjetoPokedexApp() {
                             }
                         }
                     },
-                    overlayContent = homeState.lastDrawCard?.let { cardUi ->
-                        {
-                            val qrBitmap = remember(homeState.qrContent) {
-                                homeState.qrContent?.let { content ->
-                                    QrCodeGenerator.generate(content)
-                                }
-                            }
+                    overlayContent = when {
+                        homeState.isDrawing -> {
+                            { LoadingOverlay() }
+                        }
 
-                            CardDetailDialog(
-                                card = com.example.projetopokedex.ui.cards.CollectionCardUi(
-                                    id = cardUi.cardNumber,
-                                    card = cardUi
-                                ),
-                                isShowingBack = false,
-                                onToggleFace = {  },
-                                onDismiss = { homeViewModel.clearLastDraw() },
-                                qrBitmap = qrBitmap
-                            )
-                            if (homeState.alreadyHasCard) {
-                                Spacer(modifier = Modifier.height(12.dp))
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(top = 8.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(
-                                        text = "Você já realizou o sorteio de hoje. Volte amanhã.",
-                                        fontSize = 12.sp,
-                                        color = Color.Gray,
-                                        textAlign = TextAlign.Center
-                                    )
+                        homeState.lastDrawCard != null -> {
+                            {
+                                val cardUi = homeState.lastDrawCard!!
+                                val qrBitmap = remember(homeState.qrContent) {
+                                    homeState.qrContent?.let { content ->
+                                        QrCodeGenerator.generate(content)
+                                    }
                                 }
+
+                                CardDetailDialog(
+                                    card = com.example.projetopokedex.ui.cards.CollectionCardUi(
+                                        id = cardUi.cardNumber,
+                                        card = cardUi
+                                    ),
+                                    isShowingBack = false,
+                                    onToggleFace = { },
+                                    onDismiss = { homeViewModel.clearLastDraw() },
+                                    qrBitmap = qrBitmap
+                                )
                             }
                         }
+                        else -> null
                     },
                     onOverlayDismiss = {
-                        homeViewModel.clearLastDraw()
+                        if (!homeState.isDrawing) {
+                            homeViewModel.clearLastDraw()
+                        }
                     }
                 ) {
                     HomeScreen(

@@ -1,4 +1,4 @@
-package com.example.projetopokedex.data.local
+package com.example.projetopokedex.data.local.users
 
 import android.content.Context
 import androidx.datastore.preferences.core.edit

@@ -29,127 +29,134 @@ fun HomeScreen(
     onLogoutClick: () -> Unit,
     onSortearClick: () -> Unit
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 24.dp)
-            .padding(top = 24.dp, bottom = 12.dp)
-    ) {
-        // HEADER
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 24.dp)
+                .padding(top = 24.dp, bottom = 12.dp)
         ) {
-            Text(
-                text = "DexGo",
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Bold
-            )
-
+            // HEADER
             Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = uiState.userName.ifBlank { "Usuário" },
-                    fontSize = 14.sp
+                    text = "DexGo",
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Bold
                 )
 
-                IconButton(onClick = onLogoutClick) {
-                    Icon(
-                        imageVector = Icons.Default.ExitToApp,
-                        contentDescription = "Sair"
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = uiState.userName.ifBlank { "Usuário" },
+                        fontSize = 14.sp
+                    )
+
+                    IconButton(onClick = onLogoutClick) {
+                        Icon(
+                            imageVector = Icons.Default.ExitToApp,
+                            contentDescription = "Sair"
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // CARD DE TEXTO
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color.White
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.colete_novas_cartas_todos_os_dias_atrav_s_de_sorteios_aleat_rios),
+                        fontSize = 14.sp
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = stringResource(R.string.cada_carta_cont_m_um_qrcode_escaneie_cartas_de_outros_jogadores_para_conquistar_novas_cartas),
+                        fontSize = 14.sp
                     )
                 }
             }
-        }
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(100.dp))
 
-        // CARD DE TEXTO
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = Color.White
-            ),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.colete_novas_cartas_todos_os_dias_atrav_s_de_sorteios_aleat_rios),
-                    fontSize = 14.sp
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = stringResource(R.string.cada_carta_cont_m_um_qrcode_escaneie_cartas_de_outros_jogadores_para_conquistar_novas_cartas),
-                    fontSize = 14.sp
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(100.dp))
-
-        // IMAGEM CENTRAL
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(220.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.image_sorteio_diario),
-                contentDescription = "Cartas",
-                modifier = Modifier.size(220.dp)
-            )
-        }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(48.dp)
-                .clickable(enabled = uiState.canDrawToday, onClick = onSortearClick),
-            shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = Color.White
-            ),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-        ) {
+            // IMAGEM CENTRAL
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 16.dp),
+                    .fillMaxWidth()
+                    .height(220.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = if (uiState.canDrawToday) "Sortear" else "Amanhã tem mais!",
-                    fontSize = 16.sp,
-                    textAlign = TextAlign.Center
+                Image(
+                    painter = painterResource(id = R.drawable.image_sorteio_diario),
+                    contentDescription = "Cartas",
+                    modifier = Modifier.size(220.dp)
                 )
             }
-        }
-        uiState.errorMessage?.let { msg ->
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = msg,
-                fontSize = 12.sp,
-                color = Color.Red
-            )
-        }
 
-        if (!uiState.canDrawToday && uiState.errorMessage == null) {
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = "Você já realizou o sorteio de hoje. Volte amanhã.",
-                fontSize = 12.sp,
-                color = Color.Gray
-            )
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp)
+                    .clickable(enabled = uiState.canDrawToday && !uiState.isDrawing, onClick = onSortearClick),
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color.White
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = if (uiState.isDrawing) "Sorteando..."
+                               else if (uiState.canDrawToday) "Sortear"
+                               else "Amanhã tem mais!",
+                        fontSize = 16.sp,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+            uiState.errorMessage?.let { msg ->
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = msg,
+                    fontSize = 12.sp,
+                    color = Color.Red,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+            if (!uiState.canDrawToday && uiState.errorMessage == null && !uiState.isDrawing) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Você já realizou o sorteio de hoje. Volte amanhã.",
+                    fontSize = 12.sp,
+                    color = Color.Gray,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
         }
     }
 }

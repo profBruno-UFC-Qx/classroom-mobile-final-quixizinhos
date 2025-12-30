@@ -19,6 +19,17 @@ class ProfileViewModel(
 
     init {
         loadUser()
+        observeLoginState()
+    }
+
+    private fun observeLoginState() {
+        viewModelScope.launch {
+            userRepository.isLoggedIn.collect { isLoggedIn ->
+                if (isLoggedIn) {
+                    loadUser()
+                }
+            }
+        }
     }
 
     private fun loadUser() {

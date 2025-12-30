@@ -1,7 +1,7 @@
 package com.example.projetopokedex.data.repository
 
 import com.example.projetopokedex.data.auth.JwtGenerator
-import com.example.projetopokedex.data.local.UserLocalDataSource
+import com.example.projetopokedex.data.local.users.UserLocalDataSource
 import com.example.projetopokedex.data.model.UserLocal
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -65,6 +65,9 @@ class UserRepository(
             }
 
             val token = JwtGenerator.generateToken(subject = storedUser.email)
+
+            localDataSource.saveUser(storedUser)
+
             localDataSource.saveToken(token)
             Result.success(token)
         } catch (e: Exception) {
