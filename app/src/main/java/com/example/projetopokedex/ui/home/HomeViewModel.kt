@@ -60,6 +60,8 @@ class HomeViewModel(
                     return@launch
                 }
 
+                _uiState.value = _uiState.value.copy(isDrawing = true)
+
                 val result = cardsRepository.drawDailyCard()
 
                 result
@@ -72,22 +74,25 @@ class HomeViewModel(
                             lastDrawCard = card,
                             alreadyHasCard = drawResult.alreadyOwned,
                             canDrawToday = false,
-                            errorMessage = null,   // só limpa em sucesso
-                            qrContent = qr
+                            errorMessage = null,
+                            qrContent = qr,
+                            isDrawing = false
                         )
                     }
                     .onFailure { e ->
                         _uiState.value = _uiState.value.copy(
                             errorMessage = "Erro no sorteio: ${e.message}",
                             lastDrawCard = null,
-                            alreadyHasCard = false
+                            alreadyHasCard = false,
+                            isDrawing = false
                         )
                     }
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     errorMessage = "Exceção no sorteio: ${e.javaClass.simpleName} - ${e.message}",
                     lastDrawCard = null,
-                    alreadyHasCard = false
+                    alreadyHasCard = false,
+                    isDrawing = false
                 )
             }
         }

@@ -39,6 +39,10 @@ class SignUpViewModel(
         )
     }
 
+    fun clearFields() {
+        _uiState.value = SignUpUiState()
+    }
+
     fun register() {
         val state = _uiState.value
 
