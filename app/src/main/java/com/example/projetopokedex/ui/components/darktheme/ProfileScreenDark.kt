@@ -1,4 +1,4 @@
-package com.example.projetopokedex.ui.profile
+package com.example.projetopokedex.ui.components.darktheme
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -15,9 +15,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.projetopokedex.R
+import com.example.projetopokedex.ui.profile.ProfileUiState
 
 @Composable
-fun ProfileScreen(
+fun ProfileScreenDark(
     uiState: ProfileUiState,
     onAvatarChange: (String) -> Unit,
     onNameChange: (String) -> Unit,
@@ -31,7 +32,6 @@ fun ProfileScreen(
     onConfirmDelete: () -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -47,7 +47,8 @@ fun ProfileScreen(
                 Text(
                     text = "DexGo",
                     fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
                 )
 
                 Image(
@@ -71,7 +72,6 @@ fun ProfileScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-
                 Image(
                     painter = painterResource(R.drawable.icon_avatar),
                     contentDescription = "Avatar",
@@ -83,14 +83,14 @@ fun ProfileScreen(
                 Text(
                     text = uiState.name.ifBlank { "Usuário" },
                     fontSize = 16.sp,
-                    color = Color.Gray
+                    color = Color.White
                 )
             }
 
             Spacer(modifier = Modifier.height(32.dp))
 
             // CAMPOS
-            ProfileTextField(
+            ProfileTextFieldDark(
                 label = "Senha",
                 value = uiState.password,
                 onValueChange = onPasswordChange,
@@ -99,7 +99,7 @@ fun ProfileScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            ProfileTextField(
+            ProfileTextFieldDark(
                 label = "Nome",
                 value = uiState.name,
                 onValueChange = onNameChange,
@@ -108,7 +108,7 @@ fun ProfileScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            ProfileTextField(
+            ProfileTextFieldDark(
                 label = "Avatar",
                 value = uiState.avatar,
                 onValueChange = onAvatarChange,
@@ -123,22 +123,21 @@ fun ProfileScreen(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    ProfileButton(
+                    ProfileButtonDark(
                         text = "Confirmar",
                         modifier = Modifier.weight(1f),
                         onClick = onSaveChanges
                     )
-                    ProfileButton(
+                    ProfileButtonDark(
                         text = "Cancelar",
                         modifier = Modifier.weight(1f),
                         onClick = onCancelEdit
                     )
                 }
             } else {
-                ProfileButton(
+                ProfileButtonDark(
                     text = "Editar",
-                    modifier = Modifier
-                        .fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth(),
                     onClick = onToggleEdit
                 )
             }
@@ -148,7 +147,7 @@ fun ProfileScreen(
                 Text(
                     text = "Dados atualizados com sucesso.",
                     fontSize = 12.sp,
-                    color = Color.Gray,
+                    color = Color.White,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -167,10 +166,9 @@ fun ProfileScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            ProfileButton(
+            ProfileButtonDark(
                 text = "Excluir Conta",
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 onClick = onDeleteClick
             )
         }
@@ -178,16 +176,16 @@ fun ProfileScreen(
 }
 
 @Composable
-private fun ProfileTextField(
+private fun ProfileTextFieldDark(
     label: String,
     value: String,
     onValueChange: (String) -> Unit,
     enabled: Boolean
 ) {
     val labelColor = if (enabled) {
-        Color(0xFF777777)
-    } else {
         Color(0xFFBBBBBB)
+    } else {
+        Color(0xFF777777)
     }
 
     Column(
@@ -208,80 +206,36 @@ private fun ProfileTextField(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),
-            singleLine = true
+            singleLine = true,
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedTextColor = Color.White,
+                unfocusedTextColor = Color.White,
+                disabledTextColor = Color(0xFF777777),
+                focusedBorderColor = Color.White,
+                unfocusedBorderColor = Color(0xFF777777),
+                disabledBorderColor = Color(0xFF555555)
+            )
         )
     }
 }
 
 @Composable
-private fun ProfileButton(
+private fun ProfileButtonDark(
     text: String,
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
     OutlinedButton(
         onClick = onClick,
-        modifier = modifier
-            .height(48.dp),
+        modifier = modifier.height(48.dp),
         shape = RoundedCornerShape(12.dp),
         colors = ButtonDefaults.outlinedButtonColors(
-            containerColor = Color.White,
-            contentColor = Color.Black
+            containerColor = Color.Black,
+            contentColor = Color.White
         ),
-        border = ButtonDefaults.outlinedButtonBorder
+        border = androidx.compose.foundation.BorderStroke(1.dp, Color.White)
     ) {
         Text(text = text, fontSize = 16.sp)
     }
 }
 
-@Composable
-fun DeleteAccountDialog(
-    onConfirm: () -> Unit,
-    onDismiss: () -> Unit
-) {
-    Card(
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        modifier = Modifier
-            .width(280.dp)
-            .wrapContentHeight()
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Excluir conta?",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
-
-                Text(
-                    text = "x",
-                    modifier = Modifier
-                        .clickable { onDismiss() },
-                    fontSize = 20.sp
-                )
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Text(
-                text = "Tem certeza que deseja excluir sua conta? Essa ação não pode ser desfeita.",
-                fontSize = 14.sp,
-                color = Color.Gray
-            )
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            ProfileButton(
-                text = "Confirmar",
-                onClick = onConfirm
-            )
-        }
-    }
-}

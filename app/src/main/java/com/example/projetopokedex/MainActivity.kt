@@ -12,6 +12,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -33,6 +34,7 @@ import com.example.projetopokedex.ui.navigation.PokedexScreen
 import com.example.projetopokedex.ui.signup.SignUpScreen
 import com.example.projetopokedex.ui.signup.SignUpViewModel
 import com.example.projetopokedex.ui.theme.ProjetoPokedexTheme
+import com.example.projetopokedex.ui.theme.ThemeManager
 import kotlinx.coroutines.delay
 import com.example.projetopokedex.ui.home.HomeScreen
 import com.example.projetopokedex.ui.navigation.HomeTab
@@ -43,6 +45,9 @@ import com.example.projetopokedex.ui.components.LoadingOverlay
 import com.example.projetopokedex.ui.profile.ProfileScreen
 import com.example.projetopokedex.ui.profile.ProfileViewModel
 import com.example.projetopokedex.ui.profile.DeleteAccountDialog
+import com.example.projetopokedex.ui.components.darktheme.HomeScreenDark
+import com.example.projetopokedex.ui.components.darktheme.ProfileScreenDark
+import com.example.projetopokedex.ui.components.darktheme.CardsScreenDark
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -225,6 +230,7 @@ fun ProjetoPokedexApp() {
             composable(PokedexScreen.Home.name) {
                 val homeState by homeViewModel.uiState.collectAsState()
                 var selectedTab by remember { mutableStateOf(HomeTab.Home) }
+                val isDarkTheme by remember { ThemeManager.isDarkTheme }
 
                 MainScaffold(
                     selectedTab = selectedTab,
@@ -243,6 +249,7 @@ fun ProjetoPokedexApp() {
                             }
                         }
                     },
+                    backgroundColor = if (isDarkTheme) Color.Black else Color.White,
                     overlayContent = when {
                         homeState.isDrawing -> {
                             { LoadingOverlay() }
@@ -277,24 +284,40 @@ fun ProjetoPokedexApp() {
                         }
                     }
                 ) {
-                    HomeScreen(
-                        uiState = homeState,
-                        onLogoutClick = {
-                            homeViewModel.logout()
-                            loginViewModel.clearMessages()
-                            loginViewModel.clearCredentials()
-                            navController.navigate(PokedexScreen.Login.name) {
-                                popUpTo(PokedexScreen.Home.name) { inclusive = true }
-                            }
-                        },
-                        onSortearClick = { homeViewModel.drawCard() }
-                    )
+                    if (isDarkTheme) {
+                        HomeScreenDark(
+                            uiState = homeState,
+                            onLogoutClick = {
+                                homeViewModel.logout()
+                                loginViewModel.clearMessages()
+                                loginViewModel.clearCredentials()
+                                navController.navigate(PokedexScreen.Login.name) {
+                                    popUpTo(PokedexScreen.Home.name) { inclusive = true }
+                                }
+                            },
+                            onSortearClick = { homeViewModel.drawCard() }
+                        )
+                    } else {
+                        HomeScreen(
+                            uiState = homeState,
+                            onLogoutClick = {
+                                homeViewModel.logout()
+                                loginViewModel.clearMessages()
+                                loginViewModel.clearCredentials()
+                                navController.navigate(PokedexScreen.Login.name) {
+                                    popUpTo(PokedexScreen.Home.name) { inclusive = true }
+                                }
+                            },
+                            onSortearClick = { homeViewModel.drawCard() }
+                        )
+                    }
                 }
             }
 
             composable(PokedexScreen.Cards.name) {
                 var selectedTab by remember { mutableStateOf(HomeTab.Cards) }
                 val state by cardsViewModel.uiState.collectAsState()
+                val isDarkTheme by remember { ThemeManager.isDarkTheme }
 
                 MainScaffold(
                     selectedTab = selectedTab,
@@ -313,6 +336,7 @@ fun ProjetoPokedexApp() {
                             }
                         }
                     },
+                    backgroundColor = if (isDarkTheme) Color.Black else Color.White,
                     overlayContent = state.selectedCard?.let { selected ->
                         {
                             CardDetailDialog(
@@ -327,13 +351,21 @@ fun ProjetoPokedexApp() {
                         cardsViewModel.onDismissDialog()
                     }
                 ) {
-                    CardsScreen(viewModel = cardsViewModel)
+                    if (isDarkTheme) {
+                        CardsScreenDark(
+                            state = state,
+                            onCardClick = { cardsViewModel.onCardClick(it) }
+                        )
+                    } else {
+                        CardsScreen(viewModel = cardsViewModel)
+                    }
                 }
             }
 
             composable(PokedexScreen.Profile.name) {
                 val profileState by profileViewModel.uiState.collectAsState()
                 var selectedTab by remember { mutableStateOf(HomeTab.Profile) }
+                val isDarkTheme by remember { ThemeManager.isDarkTheme }
 
                 LaunchedEffect(Unit) {
                     profileViewModel.onDismissDeleteDialog()
@@ -350,6 +382,7 @@ fun ProjetoPokedexApp() {
                             HomeTab.Profile -> { /* já está na Profile */ }
                         }
                     },
+                    backgroundColor = if (isDarkTheme) Color.Black else Color.White,
                     overlayContent = if (profileState.showDeleteDialog) {
                         {
                             DeleteAccountDialog(
@@ -368,25 +401,47 @@ fun ProjetoPokedexApp() {
                         profileViewModel.onDismissDeleteDialog()
                     }
                 ) {
-                    ProfileScreen(
-                        uiState = profileState,
-                        onAvatarChange = profileViewModel::onAvatarChange,
-                        onNameChange = profileViewModel::onNameChange,
-                        onPasswordChange = profileViewModel::onPasswordChange,
-                        onToggleEdit = profileViewModel::onToggleEdit,
-                        onSaveChanges = profileViewModel::onSaveChanges,
-                        onCancelEdit = profileViewModel::cancelEdit,
-                        onToggleThemeIcon = profileViewModel::onToggleThemeIcon,
-                        onDeleteClick = profileViewModel::onDeleteClick,
-                        onDismissDeleteDialog = profileViewModel::onDismissDeleteDialog,
-                        onConfirmDelete = {
-                            profileViewModel.confirmDeleteAccount {
-                                navController.navigate(PokedexScreen.Login.name) {
-                                    popUpTo(PokedexScreen.Home.name) { inclusive = true }
+                    if (isDarkTheme) {
+                        ProfileScreenDark(
+                            uiState = profileState,
+                            onAvatarChange = profileViewModel::onAvatarChange,
+                            onNameChange = profileViewModel::onNameChange,
+                            onPasswordChange = profileViewModel::onPasswordChange,
+                            onToggleEdit = profileViewModel::onToggleEdit,
+                            onSaveChanges = profileViewModel::onSaveChanges,
+                            onCancelEdit = profileViewModel::cancelEdit,
+                            onToggleThemeIcon = profileViewModel::onToggleThemeIcon,
+                            onDeleteClick = profileViewModel::onDeleteClick,
+                            onDismissDeleteDialog = profileViewModel::onDismissDeleteDialog,
+                            onConfirmDelete = {
+                                profileViewModel.confirmDeleteAccount {
+                                    navController.navigate(PokedexScreen.Login.name) {
+                                        popUpTo(PokedexScreen.Home.name) { inclusive = true }
+                                    }
                                 }
                             }
-                        }
-                    )
+                        )
+                    } else {
+                        ProfileScreen(
+                            uiState = profileState,
+                            onAvatarChange = profileViewModel::onAvatarChange,
+                            onNameChange = profileViewModel::onNameChange,
+                            onPasswordChange = profileViewModel::onPasswordChange,
+                            onToggleEdit = profileViewModel::onToggleEdit,
+                            onSaveChanges = profileViewModel::onSaveChanges,
+                            onCancelEdit = profileViewModel::cancelEdit,
+                            onToggleThemeIcon = profileViewModel::onToggleThemeIcon,
+                            onDeleteClick = profileViewModel::onDeleteClick,
+                            onDismissDeleteDialog = profileViewModel::onDismissDeleteDialog,
+                            onConfirmDelete = {
+                                profileViewModel.confirmDeleteAccount {
+                                    navController.navigate(PokedexScreen.Login.name) {
+                                        popUpTo(PokedexScreen.Home.name) { inclusive = true }
+                                    }
+                                }
+                            }
+                        )
+                    }
                 }
             }
         }
