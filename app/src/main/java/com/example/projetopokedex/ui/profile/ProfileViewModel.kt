@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.projetopokedex.data.model.UserLocal
 import com.example.projetopokedex.data.repository.UserRepository
+import com.example.projetopokedex.ui.theme.ThemeManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -80,6 +81,7 @@ class ProfileViewModel(
         _uiState.value = _uiState.value.copy(
             isDarkIcon = !_uiState.value.isDarkIcon
         )
+        ThemeManager.toggleTheme()
     }
 
     fun onSaveChanges() {

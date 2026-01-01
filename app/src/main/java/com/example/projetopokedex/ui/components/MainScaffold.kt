@@ -18,9 +18,11 @@ fun MainScaffold(
     onTabSelected: (HomeTab) -> Unit,
     overlayContent: (@Composable () -> Unit)? = null,
     onOverlayDismiss: (() -> Unit)? = null,
+    backgroundColor: Color = Color.White,
     content: @Composable () -> Unit
 ) {
     Scaffold(
+        containerColor = backgroundColor,
         bottomBar = {
             HomeBottomBar(
                 selectedTab = selectedTab,
