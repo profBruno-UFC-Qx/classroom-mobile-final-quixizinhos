@@ -48,6 +48,9 @@ import com.example.projetopokedex.ui.profile.DeleteAccountDialog
 import com.example.projetopokedex.ui.components.darktheme.HomeScreenDark
 import com.example.projetopokedex.ui.components.darktheme.ProfileScreenDark
 import com.example.projetopokedex.ui.components.darktheme.CardsScreenDark
+import com.example.projetopokedex.ui.components.darktheme.ScannerScreenDark
+import com.example.projetopokedex.ui.scanner.ScannerScreen
+import com.example.projetopokedex.ui.scanner.ScannerViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -164,6 +167,8 @@ fun ProjetoPokedexApp() {
             factory = ProfileViewModelFactory(userRepository)
         )
 
+        val scannerViewModel: ScannerViewModel = viewModel()
+
         val startDestination = PokedexScreen.Login.name
 
         NavHost(
@@ -242,7 +247,7 @@ fun ProjetoPokedexApp() {
                                 navController.navigate(PokedexScreen.Cards.name)
                             }
                             HomeTab.Qr -> {
-                                // tela de scanner
+                                navController.navigate(PokedexScreen.Scanner.name)
                             }
                             HomeTab.Profile -> {
                                 navController.navigate(PokedexScreen.Profile.name)
@@ -291,6 +296,7 @@ fun ProjetoPokedexApp() {
                                 homeViewModel.logout()
                                 loginViewModel.clearMessages()
                                 loginViewModel.clearCredentials()
+                                ThemeManager.setDarkTheme(false)
                                 navController.navigate(PokedexScreen.Login.name) {
                                     popUpTo(PokedexScreen.Home.name) { inclusive = true }
                                 }
@@ -304,6 +310,7 @@ fun ProjetoPokedexApp() {
                                 homeViewModel.logout()
                                 loginViewModel.clearMessages()
                                 loginViewModel.clearCredentials()
+                                ThemeManager.setDarkTheme(false)
                                 navController.navigate(PokedexScreen.Login.name) {
                                     popUpTo(PokedexScreen.Home.name) { inclusive = true }
                                 }
@@ -330,7 +337,9 @@ fun ProjetoPokedexApp() {
                                 }
                             }
                             HomeTab.Cards -> { /* já está na Home */ }
-                            HomeTab.Qr -> { /* tela de scanner */ }
+                            HomeTab.Qr -> {
+                                navController.navigate(PokedexScreen.Scanner.name)
+                            }
                             HomeTab.Profile -> {
                                 navController.navigate(PokedexScreen.Profile.name)
                             }
@@ -362,6 +371,42 @@ fun ProjetoPokedexApp() {
                 }
             }
 
+            composable(PokedexScreen.Scanner.name) {
+                var selectedTab by remember { mutableStateOf(HomeTab.Qr) }
+                val scannerState by scannerViewModel.uiState.collectAsState()
+                val isDarkTheme by remember { ThemeManager.isDarkTheme }
+
+                MainScaffold(
+                    selectedTab = selectedTab,
+                    onTabSelected = { tab ->
+                        selectedTab = tab
+                        when (tab) {
+                            HomeTab.Home -> {
+                                navController.navigate(PokedexScreen.Home.name) {
+                                    popUpTo(PokedexScreen.Home.name) { inclusive = false }
+                                }
+                            }
+                            HomeTab.Cards -> navController.navigate(PokedexScreen.Cards.name)
+                            HomeTab.Qr -> { /* já está no Scanner */ }
+                            HomeTab.Profile -> navController.navigate(PokedexScreen.Profile.name)
+                        }
+                    },
+                    backgroundColor = if (isDarkTheme) Color.Black else Color.White
+                ) {
+                    if (isDarkTheme) {
+                        ScannerScreenDark(
+                            uiState = scannerState,
+                            onScanClick = { scannerViewModel.onScanClick() }
+                        )
+                    } else {
+                        ScannerScreen(
+                            uiState = scannerState,
+                            onScanClick = { scannerViewModel.onScanClick() }
+                        )
+                    }
+                }
+            }
+
             composable(PokedexScreen.Profile.name) {
                 val profileState by profileViewModel.uiState.collectAsState()
                 var selectedTab by remember { mutableStateOf(HomeTab.Profile) }
@@ -378,7 +423,7 @@ fun ProjetoPokedexApp() {
                         when (tab) {
                             HomeTab.Home -> navController.navigate(PokedexScreen.Home.name)
                             HomeTab.Cards -> navController.navigate(PokedexScreen.Cards.name)
-                            HomeTab.Qr -> { /* scanner */ }
+                            HomeTab.Qr -> navController.navigate(PokedexScreen.Scanner.name)
                             HomeTab.Profile -> { /* já está na Profile */ }
                         }
                     },
