@@ -5,5 +5,6 @@ enum class PokedexScreen {
     SignUp,
     Home,
     Cards,
+    Scanner,
     Profile
 }
